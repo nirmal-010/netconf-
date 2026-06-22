@@ -19,4 +19,8 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/progress', require('./routes/progress'));
 
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => console.log(`Express Server started on port ${PORT}`));
+if (require.main === module) {
+  app.listen(PORT, () => console.log(`Express Server started on port ${PORT}`));
+}
+
+module.exports = app;
