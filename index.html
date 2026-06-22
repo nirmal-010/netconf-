@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Network Configurator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-wrapper">
+        <header class="app-header">
+            <h1>Enterprise NetConfig</h1>
+            <p>Full-Stack CLI Generator for IOS/NX-OS</p>
+        </header>
+        
+        <div class="main-layout">
+            <aside class="sidebar">
+                <nav class="tabs">
+                    <button class="tab-btn active" data-tab="tab-basic">Basic Info</button>
+                    <button class="tab-btn" data-tab="tab-l2">Layer 2 (Switching)</button>
+                    <button class="tab-btn" data-tab="tab-l3">Layer 3 (Routing)</button>
+                    <button class="tab-btn" data-tab="tab-security">Security</button>
+                    <button class="tab-btn" data-tab="tab-vpn">VPN</button>
+                    <button class="tab-btn" data-tab="tab-dc">Data Center</button>
+                </nav>
+                <div class="sidebar-actions">
+                    <button type="button" id="btn-generate" class="btn-primary">Generate CLI</button>
+                </div>
+            </aside>
+
+            <main class="content-area">
+                <form id="config-form">
+                    
+                    <!-- Basic Tab -->
+                    <div class="tab-content active" id="tab-basic">
+                        <h2>Basic Configuration</h2>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label for="deviceType">Device Type</label>
+                                <select id="deviceType">
+                                    <option value="router">Router (IOS)</option>
+                                    <option value="switch">Switch (IOS)</option>
+                                    <option value="nexus">Nexus (NX-OS)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="hostname">Hostname</label>
+                                <input type="text" id="hostname" placeholder="e.g., CORE-SW-01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="secret">Enable Secret</label>
+                                <input type="password" id="secret" placeholder="e.g., cisco123" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="ipAddress">Mgmt IP Address</label>
+                                <input type="text" id="ipAddress" placeholder="e.g., 10.0.0.5" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="subnetMask">Subnet Mask</label>
+                                <input type="text" id="subnetMask" placeholder="e.g., 255.255.255.0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="gateway">Default Gateway</label>
+                                <input type="text" id="gateway" placeholder="e.g., 10.0.0.1" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Layer 2 Tab -->
+                    <div class="tab-content" id="tab-l2">
+                        <h2>Layer 2 & Switching</h2>
+                        <div class="feature-card">
+                            <div class="feature-header">
+                                <h3>VLANs</h3>
+                                <label class="switch"><input type="checkbox" id="en-vlans"><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-body" id="body-vlans">
+                                <label>VLAN IDs (comma separated)</label>
+                                <input type="text" id="vlan-ids" placeholder="e.g., 10,20,30,100">
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-header">
+                                <h3>Spanning Tree Protocol (STP)</h3>
+                                <label class="switch"><input type="checkbox" id="en-stp"><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-body" id="body-stp">
+                                <label>STP Mode</label>
+                                <select id="stp-mode">
+                                    <option value="rapid-pvst">Rapid PVST+</option>
+                                    <option value="mst">MST (802.1s)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-header">
+                                <h3>Port Security</h3>
+                                <label class="switch"><input type="checkbox" id="en-portsec"><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-body" id="body-portsec">
+                                <label>Max MAC Addresses</label>
+                                <input type="number" id="portsec-max" value="2">
+                                <label>Violation Action</label>
+                                <select id="portsec-violation">
+                                    <option value="restrict">Restrict</option>
+                                    <option value="protect">Protect</option>
+                                    <option value="shutdown">Shutdown</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Layer 3 Tab -->
+                    <div class="tab-content" id="tab-l3">
+                        <h2>Layer 3 & Routing</h2>
+                        <div class="feature-card">
+                            <div class="feature-header">
+                                <h3>OSPF Routing</h3>
+                                <label class="switch"><input type="checkbox" id="en-ospf"><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-body" id="body-ospf">
+                                <div class="grid-2">
+                                    <div>
+                                        <label>Process ID</label>
+                                        <input type="number" id="ospf-pid" value="1">
+                                    </div>
+                                    <div>
+                                        <label>Network / Area (e.g. 10.0.0.0 0.0.0.255 area 0)</label>
+                                        <input type="text" id="ospf-net" placeholder="10.0.0.0 0.0.0.255 area 0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-header">
+                                <h3>BGP Routing</h3>
+                                <label class="switch"><input type="checkbox" id="en-bgp"><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-body" id="body-bgp">
+                                <div class="grid-2">
+                                    <div>
+                                        <label>Local AS Number</label>
+                                        <input type="number" id="bgp-as" placeholder="65000">
+                                    </div>
+                                    <div>
+                                        <label>Neighbor IP</label>
+                                        <input type="text" id="bgp-neighbor" placeholder="192.168.1.2">
+                                    </div>
+                                    <div>
+                                        <label>Remote AS</label>
+                                        <input type="number" id="bgp-remote-as" placeholder="65001">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Tab -->
+                    <div class="tab-content" id="tab-security">
+                        <h2>Security Features</h2>
+                        <div class="feature-card">
+                            <div class="feature-header">
+                                <h3>Access Control Lists (ACL)</h3>
+                                <label class="switch"><input type="checkbox" id="en-acl"><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-body" id="body-acl">
+                                <label>Standard ACL Name</label>
+                                <input type="text" id="acl-name" placeholder="BLOCK_GUESTS">
+                                <label>Deny IP Subnet</label>
+                                <input type="text" id="acl-deny" placeholder="172.16.0.0 0.0.255.255">
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-header">
+                                <h3>DHCP Snooping</h3>
+                                <label class="switch"><input type="checkbox" id="en-dhcp-snoop"><span class="slider"></span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VPN Tab -->
+                    <div class="tab-content" id="tab-vpn">
+                        <h2>Virtual Private Network (VPN)</h2>
+                        <div class="feature-card">
+                            <div class="feature-header">
+                                <h3>Site-to-Site IPsec VPN</h3>
+                                <label class="switch"><input type="checkbox" id="en-ipsec"><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-body" id="body-ipsec">
+                                <div class="grid-2">
+                                    <div>
+                                        <label>Peer IP Address</label>
+                                        <input type="text" id="ipsec-peer" placeholder="203.0.113.5">
+                                    </div>
+                                    <div>
+                                        <label>Pre-Shared Key</label>
+                                        <input type="password" id="ipsec-psk" placeholder="VPNSecret123">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Center Tab -->
+                    <div class="tab-content" id="tab-dc">
+                        <h2>Data Center Features</h2>
+                        <div class="feature-card">
+                            <div class="feature-header">
+                                <h3>VXLAN (Virtual Extensible LAN)</h3>
+                                <label class="switch"><input type="checkbox" id="en-vxlan"><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-body" id="body-vxlan">
+                                <div class="grid-2">
+                                    <div>
+                                        <label>VNI (VXLAN Network Identifier)</label>
+                                        <input type="number" id="vxlan-vni" placeholder="10010">
+                                    </div>
+                                    <div>
+                                        <label>Multicast Group</label>
+                                        <input type="text" id="vxlan-mcast" placeholder="239.1.1.1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-header">
+                                <h3>VRF (Virtual Routing and Forwarding)</h3>
+                                <label class="switch"><input type="checkbox" id="en-vrf"><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-body" id="body-vrf">
+                                <label>VRF Name</label>
+                                <input type="text" id="vrf-name" placeholder="MGMT_VRF">
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </main>
+
+            <aside class="output-panel">
+                <div class="output-header">
+                    <h2>CLI Output</h2>
+                    <button id="copy-btn" class="btn-secondary" title="Copy">Copy</button>
+                </div>
+                <div class="code-container">
+                    <pre><code id="output-code">! Configuration will appear here</code></pre>
+                </div>
+            </aside>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
