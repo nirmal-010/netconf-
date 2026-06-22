@@ -9,7 +9,8 @@ app.use(express.json({ limit: '50mb' }));
 app.use(cors());
 
 // Connect to MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/netconfig')
+const mongoURI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/netconfig';
+mongoose.connect(mongoURI)
 .then(() => console.log('MongoDB Connected...'))
 .catch(err => console.log('MongoDB Connection Error:', err));
 

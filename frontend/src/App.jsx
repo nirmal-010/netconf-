@@ -15,7 +15,8 @@ function App() {
     if (!token) return;
 
     try {
-      const res = await fetch('/api/progress', {
+      const API_BASE = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${API_BASE}/api/progress`, {
         headers: { 'x-auth-token': token }
       });
       if (res.ok) {

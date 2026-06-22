@@ -31,7 +31,8 @@ export default function CliOutputPanel() {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      await fetch('/api/progress', {
+      const API_BASE = import.meta.env.VITE_API_URL || '';
+      await fetch(`${API_BASE}/api/progress`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

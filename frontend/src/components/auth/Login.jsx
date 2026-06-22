@@ -67,7 +67,8 @@ export default function Login({ onLogin }) {
     setLoading(true);
     setError('');
 
-    const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
+    const API_BASE = import.meta.env.VITE_API_URL || '';
+    const endpoint = isRegister ? `${API_BASE}/api/auth/register` : `${API_BASE}/api/auth/login`;
 
     try {
       const res = await fetch(endpoint, {
