@@ -76,7 +76,14 @@ export default function Login({ onLogin }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
-      const data = await res.json();
+      
+      let data;
+      const text = await res.text();
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error(`Server returned an invalid response: ${text.substring(0, 50)}...`);
+      }
 
       if (!res.ok) {
         throw new Error(data.msg || 'Authentication failed');
