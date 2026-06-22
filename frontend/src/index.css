@@ -2,21 +2,21 @@
 @import "tailwindcss";
 
 :root {
-  --bg-deep: #020617;
-  --bg-base: #0F172A;
-  --bg-elevated: #1E293B;
-  --bg-card: #0E1223;
-  --fg-primary: #F8FAFC;
-  --fg-muted: #94A3B8;
-  --fg-dim: #475569;
-  --accent: #22C55E;
-  --accent-glow: rgba(34, 197, 94, 0.25);
-  --accent-blue: #3B82F6;
-  --accent-amber: #F59E0B;
-  --destructive: #EF4444;
-  --border: #334155;
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --ring: #22C55E;
+  --bg-deep: #F8FAFC;
+  --bg-base: #F1F5F9;
+  --bg-elevated: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --fg-primary: #0F172A;
+  --fg-muted: #475569;
+  --fg-dim: #94A3B8;
+  --accent: #16A34A;
+  --accent-glow: rgba(22, 163, 74, 0.15);
+  --accent-blue: #2563EB;
+  --accent-amber: #D97706;
+  --destructive: #DC2626;
+  --border: #E2E8F0;
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --ring: #16A34A;
   --radius: 12px;
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
@@ -46,3 +46,80 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+
+@keyframes bounce-x {
+    0%, 100% {
+        transform: translateX(-4px);
+    }
+    50% {
+        transform: translateX(0px);
+    }
+}
+
+@keyframes glow {
+    0%, 100% {
+        opacity: 0.6;
+        filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
+    }
+    50% {
+        opacity: 1;
+        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+    }
+}
+
+@keyframes float-up {
+    0% {
+        opacity: 0;
+        transform: translateY(6px);
+        filter: blur(2px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+.lighting-button {
+    animation: bounce-x 1.5s ease-in-out infinite;
+}
+.lighting-button:hover {
+    animation: none;
+    transform: translateX(0);
+}
+
+.light-glow {
+    animation: glow 2s ease-in-out infinite;
+}
+
+.word-float {
+    animation: float-up 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    will-change: transform, opacity, filter;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+}
+
+:root {
+  --vh: 1vh;
+  --app-height: 100%;
+}
+
+html, body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  height: var(--app-height);
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+@layer utilities {
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}

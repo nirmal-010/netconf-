@@ -1,9 +1,6 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
-import InterfaceManager from './InterfaceManager';
-import VlanManager from './VlanManager';
-import SecurityDashboard from './SecurityDashboard';
-import HomeDashboard from '../HomeDashboard';
+import Layer2Dashboard from './Layer2Dashboard';
 
 export default function WorkspaceRouter() {
   const activeNav = useSelector(state => state.config.workspace.activeNav);
@@ -29,14 +26,8 @@ export default function WorkspaceRouter() {
       display: 'flex', flexDirection: 'column', overflow: 'hidden'
     }}>
       <div style={{ flex: 1, overflowY: 'auto', padding: '28px' }} className="animate-fade-in">
-        {activeNav === 'dashboard' && <HomeDashboard />}
-        {activeNav === 'interfaces' && <InterfaceManager />}
-        {activeNav === 'vlans' && <VlanManager />}
-        {activeNav === 'security' && <SecurityDashboard />}
-        {activeNav === 'devices' && placeholder('Device Inventory')}
-        {activeNav === 'l2' && placeholder('Layer 2 Engine')}
+        {activeNav === 'l2' && <Layer2Dashboard />}
         {activeNav === 'l3' && placeholder('Layer 3 Routing')}
-        {activeNav === 'cli' && placeholder('Templates')}
       </div>
     </div>
   );

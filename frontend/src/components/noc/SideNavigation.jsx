@@ -7,14 +7,8 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-  { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { id: 'devices', icon: Server, label: 'Devices' },
-  { id: 'interfaces', icon: Cpu, label: 'Interfaces' },
-  { id: 'vlans', icon: Network, label: 'VLANs' },
-  { id: 'l2', icon: GitBranch, label: 'Layer 2 / STP' },
+  { id: 'l2', icon: GitBranch, label: 'Layer 2' },
   { id: 'l3', icon: Database, label: 'Layer 3' },
-  { id: 'security', icon: ShieldAlert, label: 'Security' },
-  { id: 'cli', icon: TerminalSquare, label: 'Templates' },
 ];
 
 export default function SideNavigation() {
