@@ -1,67 +1,70 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setWorkspaceNav } from '../../store/configSlice';
 import {
-  GitBranch, Database, FileCode, Server, FolderGit2, Settings,
-  ChevronLeft, ChevronRight, Layers, ShieldCheck, Activity
+  GitBranch, Database, FileCode, ChevronLeft, ChevronRight, CheckCircle2
 } from 'lucide-react';
 
 const navItems = [
-  { id: 'l2', icon: GitBranch, label: 'Layer 2 Switching', badge: 'Active', color: '#38BDF8' },
-  { id: 'l3', icon: Database, label: 'Layer 3 Routing', badge: 'Active', color: '#A855F7' },
-  { id: 'templates', icon: FileCode, label: 'Configuration Templates', badge: 'v2.4', color: '#10B981' },
-  { id: 'inventory', icon: Server, label: 'Device Inventory', badge: '48 Nodes', color: '#F59E0B' },
-  { id: 'projects', icon: FolderGit2, label: 'NOC Projects & Topology', badge: 'Git Sync', color: '#EC4899' },
-  { id: 'settings', icon: Settings, label: 'System & Engine Settings', badge: 'ENT', color: '#64748B' },
+  { id: 'l2', icon: GitBranch, label: 'Layer 2 Switching', badge: 'VLANs / Ports' },
+  { id: 'l3', icon: Database, label: 'Layer 3 Routing', badge: 'IP / OSPF / BGP' },
+  { id: 'templates', icon: FileCode, label: 'Config Templates', badge: 'Pre-Flight' },
 ];
 
 export default function SideNavigation({ isCollapsed, onToggleCollapse }) {
   const dispatch = useDispatch();
   const activeNav = useSelector(state => state.config.workspace.activeNav) || 'l2';
-  const devices = useSelector(state => state.config.devices);
-  const activeId = devices.activeId || 'dev-01';
 
   return (
     <div style={{
-      height: '100%', background: 'var(--bg-base)',
+      height: '100%', background: 'var(--bg-card)',
       display: 'flex', flexDirection: 'column',
-      paddingTop: '16px', paddingBottom: '16px',
+      padding: '20px 14px',
       position: 'relative', transition: 'width 0.2s ease',
-      width: isCollapsed ? '64px' : '230px'
+      width: isCollapsed ? '70px' : '240px',
+      borderRight: '1px solid var(--border-subtle)',
+      boxShadow: '2px 0 16px rgba(140, 120, 100, 0.04)'
     }}>
-      {/* Top Sidebar Header & Collapse Toggle */}
+      {/* Top Sidebar Brand Section (Inspired by BrewMaster Dashboard) */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'space-between',
-        padding: isCollapsed ? '0' : '0 16px', marginBottom: '16px', minHeight: '28px'
+        marginBottom: '28px', padding: isCollapsed ? '0' : '0 6px'
       }}>
-        {!isCollapsed && (
-          <div style={{
-            fontSize: '11px', fontWeight: 800, color: 'var(--fg-dim)',
-            textTransform: 'uppercase', letterSpacing: '0.12em', display: 'flex', alignItems: 'center', gap: '6px'
-          }}>
-            <Layers size={14} className="text-emerald-400" /> NOC MODULES
+        {!isCollapsed ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '36px', height: '36px', borderRadius: '12px',
+              background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#FFFFFF', fontWeight: 900, fontSize: '18px',
+              boxShadow: '0 4px 12px rgba(150, 93, 52, 0.25)'
+            }}>
+              N
+            </div>
+            <div>
+              <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--fg-pure)', letterSpacing: '-0.02em' }}>
+                NetConfig Pro
+              </div>
+              <div style={{ fontSize: '11px', color: 'var(--fg-muted)', fontWeight: 500 }}>
+                Automation Console
+              </div>
+            </div>
           </div>
-        )}
-        {onToggleCollapse && (
-          <button
-            onClick={onToggleCollapse}
-            style={{
-              width: '26px', height: '26px', borderRadius: '6px',
-              background: 'var(--bg-elevated)', border: '1px solid var(--border)',
-              color: 'var(--fg-pure)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}
-            title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-          >
-            {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-          </button>
+        ) : (
+          <div style={{
+            width: '36px', height: '36px', borderRadius: '12px',
+            background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#FFFFFF', fontWeight: 900, fontSize: '18px',
+            boxShadow: '0 4px 12px rgba(150, 93, 52, 0.25)'
+          }}>
+            N
+          </div>
         )}
       </div>
 
-      {/* Navigation List */}
-      <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '0 8px', flex: 1 }}>
+      {/* Navigation List - Exact Caramel Active Button Pattern */}
+      <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
         {navItems.map(item => {
           const isActive = activeNav === item.id;
-          const badgeText = item.id === 'inventory' ? `${devices?.allIds?.length || 1} Nodes` : item.badge;
           return (
             <button
               key={item.id}
@@ -69,19 +72,18 @@ export default function SideNavigation({ isCollapsed, onToggleCollapse }) {
               style={{
                 display: 'flex', alignItems: 'center',
                 justifyContent: isCollapsed ? 'center' : 'space-between',
-                padding: isCollapsed ? '12px 0' : '10px 12px',
-                borderRadius: '8px', border: 'none', cursor: 'pointer',
+                padding: isCollapsed ? '13px 0' : '13px 16px',
+                borderRadius: '14px', border: 'none', cursor: 'pointer',
                 fontSize: '13px', fontWeight: isActive ? 700 : 600,
-                fontFamily: 'var(--font-sans)', transition: 'all 0.15s ease',
-                background: isActive ? 'rgba(16, 185, 129, 0.12)' : 'transparent',
+                fontFamily: 'var(--font-sans)', transition: 'all 0.18s ease',
+                background: isActive ? 'var(--accent)' : 'transparent',
                 color: isActive ? '#FFFFFF' : 'var(--fg-muted)',
-                borderLeft: isActive ? `3px solid ${item.color}` : '3px solid transparent',
-                position: 'relative'
+                boxShadow: isActive ? '0 4px 14px rgba(150, 93, 52, 0.28)' : 'none'
               }}
               title={isCollapsed ? item.label : ''}
               onMouseEnter={e => {
                 if (!isActive) {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)';
+                  e.currentTarget.style.background = 'var(--bg-elevated)';
                   e.currentTarget.style.color = 'var(--fg-pure)';
                 }
               }}
@@ -92,41 +94,30 @@ export default function SideNavigation({ isCollapsed, onToggleCollapse }) {
                 }
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <item.icon size={18} style={{ color: isActive ? item.color : 'var(--fg-dim)' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <item.icon size={18} style={{ color: isActive ? '#FFFFFF' : 'var(--fg-muted)' }} />
                 {!isCollapsed && <span>{item.label}</span>}
               </div>
-              {!isCollapsed && badgeText && (
-                <span style={{
-                  fontSize: '10px', fontWeight: 700, padding: '2px 6px', borderRadius: '4px',
-                  background: isActive ? item.color : 'rgba(255, 255, 255, 0.06)',
-                  color: isActive ? '#0F172A' : 'var(--fg-dim)',
-                  fontFamily: 'var(--font-mono)'
-                }}>
-                  {badgeText}
-                </span>
-              )}
             </button>
           );
         })}
       </nav>
 
-      {/* Bottom Telemetry Mini Card */}
+      {/* Bottom System Status Badge (Exact BrewMaster Green Check Pattern) */}
       {!isCollapsed && (
         <div style={{
-          margin: '0 12px', padding: '12px', borderRadius: '8px',
+          padding: '14px 16px', borderRadius: '14px',
           background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)',
-          display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '11px'
+          display: 'flex', alignItems: 'flex-start', gap: '10px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--fg-pure)', fontWeight: 600 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Activity size={13} className="text-emerald-400" /> Cluster State
-            </span>
-            <span style={{ color: '#10B981', fontFamily: 'var(--font-mono)' }}>HEALTHY</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--fg-muted)' }}>
-            <span>Target Node:</span>
-            <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--fg-pure)' }}>{activeId}</span>
+          <CheckCircle2 size={18} style={{ color: '#16A34A', flexShrink: 0, marginTop: '1px' }} />
+          <div>
+            <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--fg-pure)' }}>
+              System Status
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--fg-muted)', marginTop: '2px' }}>
+              All systems operational
+            </div>
           </div>
         </div>
       )}

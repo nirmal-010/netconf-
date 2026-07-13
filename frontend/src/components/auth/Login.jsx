@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Network, Eye, EyeOff, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
 
 export default function Login({ onLogin }) {
   const [isRegister, setIsRegister] = useState(false);
@@ -12,7 +12,7 @@ export default function Login({ onLogin }) {
   const canvasRef = useRef(null);
   const mouseRef = useRef({ x: -1000, y: -1000, radius: 150 });
 
-  // Gentle, minimal light-themed network background
+  // Gentle, luxury warm cream background floating nodes (BrewMaster Coffee / Caramel aesthetic)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -35,25 +35,25 @@ export default function Login({ onLogin }) {
     };
     window.addEventListener('mousemove', handleMouseMove);
 
-    const pointsCount = Math.floor((width * height) / 24000);
-    const points = Array.from({ length: Math.max(26, pointsCount) }, () => ({
+    const pointsCount = Math.floor((width * height) / 26000);
+    const points = Array.from({ length: Math.max(22, pointsCount) }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.35,
-      vy: (Math.random() - 0.5) * 0.35,
-      radius: Math.random() * 1.8 + 1.2,
-      baseRadius: Math.random() * 1.8 + 1.2,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      radius: Math.random() * 2 + 1.2,
+      baseRadius: Math.random() * 2 + 1.2,
       pulse: Math.random() * Math.PI
     }));
 
     const render = () => {
-      ctx.fillStyle = '#F8FAFC';
+      ctx.fillStyle = '#FAF8F5';
       ctx.fillRect(0, 0, width, height);
 
-      // Soft grid
-      ctx.strokeStyle = 'rgba(203, 213, 225, 0.38)';
+      // Soft warm grid
+      ctx.strokeStyle = 'rgba(232, 226, 216, 0.5)';
       ctx.lineWidth = 1;
-      const gridSize = 50;
+      const gridSize = 60;
       for (let x = 0; x < width; x += gridSize) {
         ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
       }
@@ -61,7 +61,7 @@ export default function Login({ onLogin }) {
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
       }
 
-      // Nodes & Links
+      // Nodes & Links in warm caramel (#965D34)
       for (let i = 0; i < points.length; i++) {
         const p = points[i];
         p.x += p.vx;
@@ -70,7 +70,6 @@ export default function Login({ onLogin }) {
         if (p.x < 0 || p.x > width) p.vx *= -1;
         if (p.y < 0 || p.y > height) p.vy *= -1;
 
-        // Subtle mouse interaction
         const dxMouse = p.x - mouseRef.current.x;
         const dyMouse = p.y - mouseRef.current.y;
         const distMouse = Math.hypot(dxMouse, dyMouse);
@@ -80,22 +79,22 @@ export default function Login({ onLogin }) {
           p.y += (dyMouse / distMouse) * force;
         }
 
-        p.pulse += 0.04;
+        p.pulse += 0.03;
         p.radius = p.baseRadius + Math.sin(p.pulse) * 0.3;
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#16A34A';
+        ctx.fillStyle = '#965D34';
         ctx.fill();
 
         for (let j = i + 1; j < points.length; j++) {
           const p2 = points[j];
           const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-          if (dist < 135) {
+          if (dist < 140) {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(22, 163, 74, ${(1 - dist / 135) * 0.24})`;
+            ctx.strokeStyle = `rgba(150, 93, 52, ${(1 - dist / 140) * 0.18})`;
             ctx.lineWidth = 1;
             ctx.stroke();
           }
@@ -163,56 +162,57 @@ export default function Login({ onLogin }) {
   return (
     <div style={{
       width: '100%', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      backgroundColor: '#F8FAFC', position: 'relative', overflow: 'hidden', padding: '20px'
+      backgroundColor: '#FAF8F5', position: 'relative', overflow: 'hidden', padding: '20px'
     }}>
       
-      {/* Minimal Background Canvas */}
+      {/* Warm Cream Canvas Background */}
       <canvas
         ref={canvasRef}
         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1, pointerEvents: 'none' }}
       />
 
-      {/* Ultra Simple, Premium Light Glassmorphic Login Card */}
+      {/* Luxury Warm White Card (Exact BrewMaster Pattern) */}
       <div style={{
         position: 'relative', zIndex: 10,
-        width: '100%', maxWidth: '380px',
-        backgroundColor: 'rgba(255, 255, 255, 0.88)',
+        width: '100%', maxWidth: '390px',
+        backgroundColor: 'rgba(255, 255, 255, 0.94)',
         backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(203, 213, 225, 0.65)',
-        borderRadius: '20px',
-        padding: '38px 34px',
-        boxShadow: '0 20px 45px -12px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.03)'
+        border: '1px solid #F0EAE1',
+        borderRadius: '24px',
+        padding: '40px 36px',
+        boxShadow: '0 20px 50px -12px rgba(140, 120, 100, 0.12), 0 4px 14px -2px rgba(140, 120, 100, 0.05)'
       }}>
         
         {/* Simple Brand & Title */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '26px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '28px' }}>
           <div style={{
-            width: '36px', height: '36px', borderRadius: '10px',
-            background: 'linear-gradient(135deg, #16A34A 0%, #0D9488 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)'
+            width: '42px', height: '42px', borderRadius: '14px',
+            backgroundColor: '#965D34', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#FFFFFF', fontWeight: 900, fontSize: '20px',
+            boxShadow: '0 4px 14px rgba(150, 93, 52, 0.3)'
           }}>
-            <Network size={20} color="#FFFFFF" />
+            N
           </div>
           <div>
-            <div style={{ fontSize: '17px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.2 }}>NetConfig Pro</div>
-            <div style={{ fontSize: '11px', fontWeight: 600, color: '#64748B' }}>Network Automation Console</div>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#2B231D', letterSpacing: '-0.02em', lineHeight: 1.2 }}>NetConfig Pro</div>
+            <div style={{ fontSize: '11px', fontWeight: 600, color: '#6B635B' }}>Network Automation Suite</div>
           </div>
         </div>
 
-        <h1 style={{ fontSize: '21px', fontWeight: 800, color: '#0F172A', marginBottom: '6px', letterSpacing: '-0.02em' }}>
-          {isRegister ? 'Create an account' : 'Sign in'}
+        <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#2B231D', marginBottom: '6px', letterSpacing: '-0.02em' }}>
+          {isRegister ? 'Create an account' : 'Welcome back'}
         </h1>
-        <p style={{ fontSize: '13px', color: '#64748B', marginBottom: '26px' }}>
-          {isRegister ? 'Enter details to register new operator' : 'Enter your credentials to continue'}
+        <p style={{ fontSize: '13px', color: '#6B635B', marginBottom: '28px' }}>
+          {isRegister ? 'Enter details to register new operator' : 'Enter your credentials to access console'}
         </p>
 
         {error && (
           <div style={{
-            padding: '10px 12px', background: '#FEF2F2', border: '1px solid #FCA5A5',
-            color: '#DC2626', borderRadius: '10px', marginBottom: '18px', fontSize: '13px',
-            display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 500
+            padding: '12px 14px', background: '#FEE2E2', border: '1px solid #FECACA',
+            color: '#B91C1C', borderRadius: '12px', marginBottom: '20px', fontSize: '13px',
+            display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600
           }}>
-            <AlertCircle size={16} className="text-red-500 shrink-0" />
+            <AlertCircle size={16} style={{ flexShrink: 0 }} />
             <span>{error}</span>
           </div>
         )}
@@ -220,7 +220,7 @@ export default function Login({ onLogin }) {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           
           <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#2B231D', marginBottom: '6px' }}>
               Username
             </label>
             <input 
@@ -229,19 +229,18 @@ export default function Login({ onLogin }) {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               style={{
-                width: '100%', padding: '11px 14px', borderRadius: '10px',
-                border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF', color: '#0F172A',
-                fontSize: '14px', fontWeight: 500, outline: 'none', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+                width: '100%', padding: '12px 14px', borderRadius: '12px',
+                border: '1px solid #E8E2D8', backgroundColor: '#FFFFFF', color: '#2B231D',
+                fontSize: '14px', fontWeight: 500, outline: 'none', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
               }}
-              onFocus={(e) => { e.target.style.borderColor = '#16A34A'; e.target.style.boxShadow = '0 0 0 4px rgba(22, 163, 74, 0.12)'; }}
-              onBlur={(e) => { e.target.style.borderColor = '#CBD5E1'; e.target.style.boxShadow = '0 1px 2px rgba(0,0,0,0.03)'; }}
+              onFocus={(e) => { e.target.style.borderColor = '#965D34'; e.target.style.boxShadow = '0 0 0 4px rgba(150, 93, 52, 0.14)'; }}
+              onBlur={(e) => { e.target.style.borderColor = '#E8E2D8'; e.target.style.boxShadow = 'none'; }}
               required
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#2B231D', marginBottom: '6px' }}>
               Password
             </label>
             <div style={{ position: 'relative' }}>
@@ -251,13 +250,12 @@ export default function Login({ onLogin }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 style={{
-                  width: '100%', padding: '11px 38px 11px 14px', borderRadius: '10px',
-                  border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF', color: '#0F172A',
-                  fontSize: '14px', fontWeight: 500, outline: 'none', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+                  width: '100%', padding: '12px 40px 12px 14px', borderRadius: '12px',
+                  border: '1px solid #E8E2D8', backgroundColor: '#FFFFFF', color: '#2B231D',
+                  fontSize: '14px', fontWeight: 500, outline: 'none', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
-                onFocus={(e) => { e.target.style.borderColor = '#16A34A'; e.target.style.boxShadow = '0 0 0 4px rgba(22, 163, 74, 0.12)'; }}
-                onBlur={(e) => { e.target.style.borderColor = '#CBD5E1'; e.target.style.boxShadow = '0 1px 2px rgba(0,0,0,0.03)'; }}
+                onFocus={(e) => { e.target.style.borderColor = '#965D34'; e.target.style.boxShadow = '0 0 0 4px rgba(150, 93, 52, 0.14)'; }}
+                onBlur={(e) => { e.target.style.borderColor = '#E8E2D8'; e.target.style.boxShadow = 'none'; }}
                 required
               />
               <button
@@ -265,10 +263,10 @@ export default function Login({ onLogin }) {
                 onClick={() => setShowPassword(!showPassword)}
                 style={{
                   position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)',
-                  background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', transition: 'color 0.15s ease'
+                  background: 'none', border: 'none', color: '#8C827A', cursor: 'pointer', transition: 'color 0.15s ease'
                 }}
-                onMouseOver={(e) => e.currentTarget.style.color = '#0F172A'}
-                onMouseOut={(e) => e.currentTarget.style.color = '#64748B'}
+                onMouseOver={(e) => e.currentTarget.style.color = '#2B231D'}
+                onMouseOut={(e) => e.currentTarget.style.color = '#8C827A'}
               >
                 {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
               </button>
@@ -279,16 +277,16 @@ export default function Login({ onLogin }) {
             type="submit"
             disabled={loading}
             style={{
-              marginTop: '6px', width: '100%', padding: '12px',
-              background: loading ? '#86EFAC' : 'linear-gradient(135deg, #16A34A 0%, #0D9488 100%)',
-              color: '#FFFFFF', border: 'none', borderRadius: '10px',
+              marginTop: '6px', width: '100%', padding: '13px',
+              backgroundColor: loading ? '#D6AD90' : '#965D34',
+              color: '#FFFFFF', border: 'none', borderRadius: '12px',
               fontSize: '14px', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
               transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: loading ? 'none' : '0 4px 14px rgba(22, 163, 74, 0.3)'
+              boxShadow: loading ? 'none' : '0 6px 16px rgba(150, 93, 52, 0.28)'
             }}
-            onMouseOver={(e) => !loading && (e.currentTarget.style.transform = 'translateY(-1px)', e.currentTarget.style.boxShadow = '0 6px 18px rgba(22, 163, 74, 0.42)')}
-            onMouseOut={(e) => !loading && (e.currentTarget.style.transform = 'translateY(0)', e.currentTarget.style.boxShadow = '0 4px 14px rgba(22, 163, 74, 0.3)')}
+            onMouseOver={(e) => !loading && (e.currentTarget.style.backgroundColor = '#834E26', e.currentTarget.style.transform = 'translateY(-1px)', e.currentTarget.style.boxShadow = '0 8px 20px rgba(150, 93, 52, 0.36)')}
+            onMouseOut={(e) => !loading && (e.currentTarget.style.backgroundColor = '#965D34', e.currentTarget.style.transform = 'translateY(0)', e.currentTarget.style.boxShadow = '0 6px 16px rgba(150, 93, 52, 0.28)')}
             onMouseDown={(e) => !loading && (e.currentTarget.style.transform = 'scale(0.99)')}
             onMouseUp={(e) => !loading && (e.currentTarget.style.transform = 'translateY(-1px)')}
           >
@@ -305,16 +303,16 @@ export default function Login({ onLogin }) {
         </form>
 
         {/* Minimal Toggle & Demo Options */}
-        <div style={{ marginTop: '26px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid rgba(203, 213, 225, 0.4)', paddingTop: '20px' }}>
+        <div style={{ marginTop: '28px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid #F0EAE1', paddingTop: '22px' }}>
           <button
             type="button"
             onClick={() => { setIsRegister(!isRegister); setError(''); }}
             style={{
-              background: 'none', border: 'none', color: '#0284C7', fontSize: '13px',
+              background: 'none', border: 'none', color: '#2563EB', fontSize: '13px',
               fontWeight: 600, cursor: 'pointer', transition: 'color 0.15s ease'
             }}
-            onMouseOver={(e) => e.currentTarget.style.color = '#0369A1'}
-            onMouseOut={(e) => e.currentTarget.style.color = '#0284C7'}
+            onMouseOver={(e) => e.currentTarget.style.color = '#1D4ED8'}
+            onMouseOut={(e) => e.currentTarget.style.color = '#2563EB'}
           >
             {isRegister ? 'Already have an account? Sign in' : "Don't have an account? Register"}
           </button>
@@ -324,13 +322,13 @@ export default function Login({ onLogin }) {
               type="button"
               onClick={fillDemo}
               style={{
-                background: 'rgba(241, 245, 249, 0.8)', border: '1px solid #E2E8F0', color: '#475569',
-                fontSize: '11px', fontWeight: 600, padding: '7px 14px', borderRadius: '8px',
+                background: '#F7F3EE', border: '1px solid #E8E2D8', color: '#6B635B',
+                fontSize: '11px', fontWeight: 600, padding: '8px 16px', borderRadius: '10px',
                 cursor: 'pointer', margin: '2px auto 0', transition: 'all 0.15s ease',
                 display: 'flex', alignItems: 'center', gap: '6px'
               }}
-              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#E2E8F0'; e.currentTarget.style.color = '#0F172A'; }}
-              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(241, 245, 249, 0.8)'; e.currentTarget.style.color = '#475569'; }}
+              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#E8E2D8'; e.currentTarget.style.color = '#2B231D'; }}
+              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#F7F3EE'; e.currentTarget.style.color = '#6B635B'; }}
             >
               <span>💡</span> Quick fill: demo admin account
             </button>

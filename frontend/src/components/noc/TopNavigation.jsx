@@ -16,7 +16,7 @@ export default function TopNavigation() {
   const activeDevice = devices.byId[activeId] || { hostname: 'Core-SW-01', vendor: 'Cisco', platform: 'IOS-XE' };
   const l3 = fullState.l3?.byId?.[activeId] || { routingVendor: 'cisco' };
 
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState('light');
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
@@ -61,55 +61,34 @@ export default function TopNavigation() {
 
   return (
     <header style={{
-      height: '64px', borderBottom: '1px solid var(--border)',
+      height: '68px', borderBottom: '1px solid var(--border-subtle)',
       background: 'var(--bg-card)', display: 'flex', alignItems: 'center',
-      justifyContent: 'space-between', padding: '0 24px',
+      justifyContent: 'space-between', padding: '0 28px',
       position: 'sticky', top: 0, zIndex: 100,
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)'
+      boxShadow: '0 2px 12px rgba(140, 120, 100, 0.04)'
     }}>
-      {/* Left: Brand & Live Device Info Pill */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            width: '36px', height: '36px', borderRadius: '8px',
-            background: 'var(--accent-glow)', border: '1px solid var(--accent)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'var(--accent)', fontWeight: 900, fontSize: '18px'
-          }}>
-            N
-          </div>
-          <div>
-            <span style={{ fontWeight: 900, fontSize: '16px', letterSpacing: '-0.02em', color: 'var(--fg-pure)' }}>
-              NetConfig<span style={{ color: 'var(--accent)' }}> Pro</span>
-            </span>
-            <div style={{ fontSize: '10px', color: 'var(--fg-dim)', fontWeight: 600, letterSpacing: '0.06em' }}>
-              ENTERPRISE AUTOMATION SUITE
-            </div>
-          </div>
-        </div>
-
-        {/* Device & OS Telemetry Bar */}
+      {/* Left: Device & OS Telemetry Bar in Warm Cream */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: '12px',
-          background: 'var(--bg-base)', padding: '6px 14px', borderRadius: '8px',
+          background: 'var(--bg-elevated)', padding: '8px 16px', borderRadius: '12px',
           border: '1px solid var(--border-subtle)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 700, color: 'var(--fg-pure)' }}>
-            <Cpu size={14} className="text-emerald-400" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 700, color: 'var(--fg-pure)' }}>
+            <Cpu size={15} style={{ color: 'var(--accent)' }} />
             <span>{activeDevice.hostname}</span>
           </div>
-          <span style={{ color: 'var(--border)' }}>|</span>
+          <span style={{ color: 'var(--border)' }}>•</span>
           <div style={{ fontSize: '12px', color: 'var(--accent-blue)', fontWeight: 600 }}>
             {currentVendorName}
           </div>
-          <span style={{ color: 'var(--border)' }}>|</span>
+          <span style={{ color: 'var(--border)' }}>•</span>
           <div style={{
-            padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 700,
-            background: activeNav === 'l3' ? 'rgba(168, 85, 247, 0.15)' : 'rgba(56, 189, 248, 0.15)',
-            color: activeNav === 'l3' ? '#C084FC' : '#38BDF8',
-            display: 'flex', alignItems: 'center', gap: '4px'
+            padding: '2px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700,
+            background: 'rgba(150, 93, 52, 0.12)', color: 'var(--accent)',
+            display: 'flex', alignItems: 'center', gap: '5px'
           }}>
-            <Layers size={12} />
+            <Layers size={13} />
             {activeNav === 'l3' ? 'Layer 3 Routing' : 'Layer 2 Switching'}
           </div>
         </div>
@@ -118,18 +97,18 @@ export default function TopNavigation() {
       {/* Center: Live Validation Status Pill */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <div style={{
-          padding: '6px 14px', borderRadius: '20px',
-          background: isValid ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
-          border: `1px solid ${isValid ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-          color: isValid ? '#10B981' : '#EF4444',
+          padding: '6px 16px', borderRadius: '20px',
+          background: isValid ? '#DCFCE7' : '#FEE2E2',
+          border: `1px solid ${isValid ? '#BBF7D0' : '#FECACA'}`,
+          color: isValid ? '#15803D' : '#B91C1C',
           fontSize: '12px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px'
         }}>
           {isValid ? (
             <>
               <CheckCircle2 size={15} />
-              <span>✔ Validation Passed</span>
+              <span>✔ Configuration Valid & Pre-Flight Passed</span>
               {warningCount > 0 && (
-                <span style={{ color: '#F59E0B', marginLeft: '4px' }}>({warningCount} ⚠)</span>
+                <span style={{ color: '#D97706', marginLeft: '4px' }}>({warningCount} ⚠)</span>
               )}
             </>
           ) : (
@@ -142,70 +121,54 @@ export default function TopNavigation() {
       </div>
 
       {/* Right: Actions & Theme Switch */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         
-        {/* Generate CLI Button */}
+        {/* Generate CLI Button in Warm Caramel */}
         <button
           onClick={handleGenerate}
           style={{
-            padding: '8px 16px', borderRadius: '6px', border: 'none',
-            background: 'linear-gradient(135deg, #38BDF8, #10B981)',
-            color: '#0F172A', fontSize: '13px', fontWeight: 800,
-            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
-            boxShadow: '0 2px 10px rgba(16, 185, 129, 0.3)',
-            transition: 'transform 0.15s ease'
+            padding: '9px 18px', borderRadius: '12px', border: 'none',
+            background: 'var(--accent)', color: '#FFFFFF', fontSize: '13px', fontWeight: 700,
+            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
+            boxShadow: '0 4px 14px rgba(150, 93, 52, 0.3)',
+            transition: 'all 0.18s ease'
           }}
-          onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-1px)'}
-          onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+          onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'var(--accent-hover)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+          onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'var(--accent)'; e.currentTarget.style.transform = 'translateY(0)'; }}
         >
-          <Terminal size={15} /> Generate CLI
+          <Terminal size={16} /> Generate CLI Output
         </button>
 
         {/* Download Button */}
         <button
           onClick={handleDownload}
           style={{
-            padding: '8px 14px', borderRadius: '6px',
-            background: 'var(--bg-base)', border: '1px solid var(--border)',
+            padding: '9px 16px', borderRadius: '12px',
+            background: 'var(--bg-elevated)', border: '1px solid var(--border)',
             color: 'var(--fg-pure)', fontSize: '13px', fontWeight: 600,
             cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
             transition: 'all 0.15s ease'
           }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = '#10B981'; e.currentTarget.style.color = '#10B981'; }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--fg-pure)'; }}
           title="Download Configuration File"
         >
-          <Download size={15} /> Download
-        </button>
-
-        {/* Deploy Button (Future/Disabled) */}
-        <button
-          disabled
-          style={{
-            padding: '8px 14px', borderRadius: '6px',
-            background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)',
-            color: 'var(--fg-dim)', fontSize: '13px', fontWeight: 600,
-            cursor: 'not-allowed', display: 'flex', alignItems: 'center', gap: '6px',
-            opacity: 0.6
-          }}
-          title="Direct Device Deployment (Coming Soon in v2.5)"
-        >
-          <UploadCloud size={15} /> Deploy
+          <Download size={16} /> Download
         </button>
 
         {/* Theme Switch */}
         <button
           onClick={toggleTheme}
           style={{
-            width: '36px', height: '36px', borderRadius: '6px',
-            background: 'var(--bg-base)', border: '1px solid var(--border)',
+            width: '38px', height: '38px', borderRadius: '12px',
+            background: 'var(--bg-elevated)', border: '1px solid var(--border)',
             color: 'var(--fg-pure)', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: 'all 0.15s ease'
           }}
-          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} NOC Theme`}
+          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Theme`}
         >
-          {theme === 'dark' ? <Moon size={16} className="text-emerald-400" /> : <Sun size={16} className="text-amber-400" />}
+          {theme === 'dark' ? <Sun size={17} style={{ color: '#FBBF24' }} /> : <Moon size={17} style={{ color: 'var(--accent)' }} />}
         </button>
 
       </div>
