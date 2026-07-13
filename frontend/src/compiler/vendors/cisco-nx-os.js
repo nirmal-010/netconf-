@@ -1,4 +1,4 @@
-import { normalizeInterfaceName } from './nameExpander';
+import { normalizeInterfaceName } from './nameExpander.js';
 
 export const buildNxOsConfig = (state) => {
   const activeDevId = state.devices.activeId;
@@ -45,8 +45,14 @@ export const buildNxOsConfig = (state) => {
 
   // Global Security
   cli += `! GLOBAL SECURITY CONFIGURATION\n`;
-  if (security.dhcpSnooping) cli += `ip dhcp snooping\nip dhcp snooping vlan 1-4094\n`;
-  if (security.dai) cli += `ip arp inspection vlan 1-4094\n`;
+  if (security.dhcpSnooping) {
+    const vlanList = vlans.length > 0 ? vlans.map(v => v.vlanId).join(',') : '1-4094';
+    cli += `ip dhcp snooping\nip dhcp snooping vlan ${vlanList}\n`;
+  }
+  if (security.dai) {
+    const vlanList = vlans.length > 0 ? vlans.map(v => v.vlanId).join(',') : '1-4094';
+    cli += `ip arp inspection vlan ${vlanList}\n`;
+  }
   if (security.bpduGuard) cli += `spanning-tree port type edge bpduguard default\n`;
   if (security.loopGuard) cli += `spanning-tree loopguard default\n`;
   cli += `!\n`;
@@ -121,7 +127,7 @@ export const buildNxOsConfig = (state) => {
   });
 
   uniqueInterfaces.forEach(intf => {
-    const normName = normalizeInterfaceName(intf.name, 'NX-OS');
+    const normName = normalizeInterfaceName(intf.name, intf.number, 'NX-OS');
     cli += `interface ${normName}\n`;
     if (intf.speed && intf.speed !== 'auto') cli += ` speed ${intf.speed}\n`;
     if (intf.duplex && intf.duplex !== 'auto') cli += ` duplex ${intf.duplex}\n`;

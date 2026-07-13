@@ -1,4 +1,4 @@
-import { normalizeInterfaceName } from './nameExpander';
+import { normalizeInterfaceName } from './nameExpander.js';
 
 export const buildIosXeConfig = (state) => {
   const activeDevId = state.devices.activeId;

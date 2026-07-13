@@ -1,0 +1,224 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NetConfig Pro Multi-Vendor Syntax & Compiler Metadata Schema",
+  "description": "Authoritative machine-readable definitions for CLI compilation across 9 enterprise network operating systems.",
+  "version": "2.3.0",
+  "vendors": {
+    "IOS-XE": {
+      "vendor": "Cisco",
+      "platformName": "Cisco IOS-XE (Catalyst / ISR Series)",
+      "entryMode": ["enable", "configure terminal"],
+      "commentSyntax": "! === SECTION ===",
+      "exitAndSave": ["end", "write memory"],
+      "interfaceNaming": {
+        "physical": "GigabitEthernet{slot}/{bay}/{port}",
+        "channelGroup": "Port-channel{id}",
+        "caseSensitive": false
+      },
+      "l2Rules": {
+        "access": ["switchport mode access", "switchport access vlan {vlanId}", "switchport voice vlan {voiceVlan}"],
+        "trunk": ["switchport mode trunk", "switchport trunk allowed vlan {vlanList}", "switchport trunk native vlan {nativeVlan}"],
+        "stp": "spanning-tree mode {mst|rapid-pvst}"
+      },
+      "l3Rules": {
+        "ospf": ["router ospf {processId}", "router-id {routerId}", "network {network} {wildcard} area {area}"],
+        "bgp": ["router bgp {asn}", "bgp router-id {routerId}", "neighbor {ip} remote-as {remoteAs}"],
+        "staticRoute": "ip route {prefix} {mask} {nextHop} [{distance}]"
+      }
+    },
+    "NX-OS": {
+      "vendor": "Cisco",
+      "platformName": "Cisco NX-OS (Nexus Data Center Spine/Leaf)",
+      "entryMode": ["configure terminal"],
+      "commentSyntax": "! === SECTION ===",
+      "exitAndSave": ["end", "copy running-config startup-config"],
+      "interfaceNaming": {
+        "physical": "Ethernet{slot}/{port}",
+        "channelGroup": "port-channel{id}",
+        "caseSensitive": false
+      },
+      "featureTogglesRequired": true,
+      "features": {
+        "vtp": "feature vtp",
+        "lacp": "feature lacp",
+        "dhcpSnooping": {
+          "prerequisiteFeature": "feature dhcp",
+          "snoopingEnable": ["ip dhcp snooping", "ip dhcp snooping vlan {vlanList}"]
+        },
+        "udld": "feature udld",
+        "ospf": "feature ospf",
+        "bgp": "feature bgp"
+      },
+      "l2Rules": {
+        "access": ["switchport mode access", "switchport access vlan {vlanId}"],
+        "trunk": ["switchport mode trunk", "switchport trunk allowed vlan {vlanList}", "switchport trunk native vlan {nativeVlan}"]
+      }
+    },
+    "EOS": {
+      "vendor": "Arista",
+      "platformName": "Arista EOS (Data Center Core Switch)",
+      "entryMode": ["configure terminal"],
+      "commentSyntax": "! === SECTION ===",
+      "exitAndSave": ["end", "write memory", "copy run start"],
+      "interfaceNaming": {
+        "physical": "Ethernet{slot}/{port}",
+        "channelGroup": "Port-Channel{id}",
+        "caseSensitive": false
+      },
+      "l2Rules": {
+        "access": ["switchport mode access", "switchport access vlan {vlanId}"],
+        "trunk": ["switchport mode trunk", "switchport trunk allowed vlan {vlanList}", "switchport trunk native vlan {nativeVlan}"]
+      },
+      "l3Rules": {
+        "ospf": ["router ospf {processId}", "router-id {routerId}", "network {network}/{prefixLength} area {area}"],
+        "bgp": ["router bgp {asn}", "router-id {routerId}", "neighbor {ip} remote-as {remoteAs}"]
+      }
+    },
+    "JUNOS": {
+      "vendor": "Juniper",
+      "platformName": "Juniper Junos (EX/QFX Series Enterprise Switch)",
+      "entryMode": ["configure"],
+      "commentSyntax": "/* === SECTION === */",
+      "exitAndSave": ["commit check", "commit comment \"{comment}\""],
+      "style": "pure_hierarchical_brackets",
+      "interfaceNaming": {
+        "physical": "ge-{fpc}/{pic}/{port}",
+        "channelGroup": "ae{id}",
+        "unit": "unit 0"
+      },
+      "hierarchies": {
+        "switchingOptions": {
+          "path": "ethernet-switching-options",
+          "rules": {
+            "snoopingScope": "MUST be placed strictly inside `ethernet-switching-options { secure-access-port { vlan {vlanName} { dhcp-snooping; arp-inspection; } } }`. Bare global secure-access-port dhcp-snooping is invalid and rejected on commit.",
+            "dhcpTrustedPlacement": "MUST be placed strictly under `secure-access-port { interface {aeX.0|ge-X/Y/Z.0} { dhcp-trusted; } }`. Never place under interface unit 0 family hierarchy."
+          }
+        },
+        "vlans": {
+          "path": "vlans",
+          "namingConstraint": "VLAN names must not be 'ip' or 'default' as they conflict with Junos reserved tokens."
+        },
+        "interfaces": {
+          "path": "interfaces",
+          "trunkMembersRule": "Trunk unit 0 family ethernet-switching vlan members MUST explicitly list exact allowed VLAN names OR IDs plus the native VLAN (`members [ HR_NETWORK SERVER_FARM MGMT_VLAN ]`). Never rely solely on native-vlan-id."
+        },
+        "routingProtocols": {
+          "path": "protocols",
+          "ospf": "protocols { ospf { area {area} { interface {intf} { ... } } } }",
+          "bgp": "protocols { bgp { group {groupName} { type external; neighbor {ip} { peer-as {remoteAs}; } } } }"
+        }
+      }
+    },
+    "AOS-CX": {
+      "vendor": "HPE Aruba",
+      "platformName": "HPE Aruba AOS-CX (CX 6200/6300/8325 Core)",
+      "entryMode": ["configure terminal"],
+      "commentSyntax": "! === SECTION ===",
+      "exitAndSave": ["end", "write memory"],
+      "interfaceNaming": {
+        "physical": "{slot}/{module}/{port}",
+        "channelGroup": "lag {id}"
+      },
+      "l2Rules": {
+        "access": ["vlan access {vlanId}"],
+        "trunk": ["vlan trunk native {nativeVlan}", "vlan trunk allowed {vlanList}"]
+      }
+    },
+    "AW+": {
+      "vendor": "Allied Telesis",
+      "platformName": "AlliedWare Plus AW+ (Allied Telesis Core)",
+      "entryMode": ["enable", "configure terminal"],
+      "commentSyntax": "! === SECTION ===",
+      "exitAndSave": ["end", "copy running-config startup-config"],
+      "interfaceNaming": {
+        "physical": "port{slot}.{board}.{port}",
+        "channelGroup": {
+          "static": "interface sa{id}",
+          "dynamicLacp": "interface po{id}",
+          "firmwareNote": "Branch interface prefix based on channelMode: static aggregation uses sa{id}, while dynamic LACP (x510/x930/SBx series) uses po{id}."
+        }
+      },
+      "l2Rules": {
+        "access": ["switchport mode access", "switchport access vlan {vlanId}"],
+        "trunk": ["switchport mode trunk", "switchport trunk allowed vlan add {vlanList}", "switchport trunk native vlan {nativeVlan}"]
+      }
+    },
+    "AOS": {
+      "vendor": "Alcatel-Lucent Enterprise",
+      "platformName": "Alcatel-Lucent OmniSwitch AOS (6860E/6900/9900 PoE Enterprise)",
+      "release": "Release 8 (Production Architectural Standard)",
+      "entryMode": ["configure system"],
+      "commentSyntax": "! === SECTION ===",
+      "exitAndSave": [
+        "copy running-config working (Stage 1: Commit active changes to working storage)",
+        "copy working certified (Stage 2: Certify working configuration to survive chassis reboots)"
+      ],
+      "productionSafeguards": {
+        "featureSeparation": "NEVER use `ip helper dhcp-snooping enable`. `ip helper` is exclusively for DHCP Relay across subnets. DHCP Snooping MUST use `dhcp-snooping admin-state enable` and `dhcp-snooping vlan {id} enable`.",
+        "vlanScopedArpInspection": "Never output bare global `arp-inspection enable`. Must always be scoped: `arp-inspection vlan {id} enable` and trusted on uplinks via `arp-inspection port {chassis/slot/port} trust`.",
+        "chassisPortNumbering": "6860E/6900/9900 chassis use `1/1` (`slot/port`) or `1/1/1` (`chassis/slot/port`) format. Never output `0/1` as slot 0 does not host data ports. Verify exact naming via `show interfaces status`.",
+        "stormControlKeyword": "Storm control uses `interfaces {port} bcast-storm threshold {val}`. Verify threshold keyword exact match against firmware minor release.",
+        "memoryPersistence": "Do NOT use Cisco-style `write memory`. Exclusively save via explicit two-stage commit (`copy running-config working` AND `copy working certified`) so changes persist across chassis reboots."
+      },
+      "interfaceNaming": {
+        "physical": "{chassis}/{slot}/{port} or {slot}/{port} (e.g. 1/1/1 or 1/1)",
+        "channelGroup": "linkagg {id} / agg {id}"
+      },
+      "l2Rules": {
+        "membership": [
+          "vlan {vlanId} members port {slot}/{port} untagged",
+          "vlan {vlanId} members port {slot}/{port} tagged",
+          "vlan {vlanId} members linkagg {id} tagged"
+        ]
+      },
+      "l3Rules": {
+        "releaseVersionNotes": "AOS Release 8 initializes routing protocol contexts directly (`ip router ospf`, `ip router bgp`). Legacy AOS 6.x `ip load ospf` / `ip load bgp` commands are deprecated and omitted in AOS 8.",
+        "ospf": ["ip router ospf", "ip ospf status enable", "ip ospf router-id {routerId}", "ip ospf area {area}", "ip ospf area {area} status enable"],
+        "bgp": ["ip router bgp", "ip bgp autonomous-system {asn}", "ip bgp status enable", "ip bgp neighbor {ip} as {remoteAs}", "ip bgp neighbor {ip} status enable"]
+      }
+    },
+    "JetStream": {
+      "vendor": "TP-Link",
+      "platformName": "TP-Link JetStream (Managed Gigabit L3)",
+      "entryMode": ["enable", "configure"],
+      "commentSyntax": "! === SECTION ===",
+      "exitAndSave": ["end", "copy running-config startup-config"],
+      "interfaceNaming": {
+        "physical": "gigabitEthernet {slot}/{channel}/{port}",
+        "channelGroup": "port-channel {id}"
+      },
+      "l2Rules": {
+        "generalMode": ["switchport general allowed vlan {vlanList} tagged|untagged", "switchport pvid {nativeVlan}"]
+      }
+    },
+    "D-Link": {
+      "vendor": "D-Link",
+      "platformName": "D-Link DGS/DXS (Managed Enterprise L2/L3)",
+      "entryMode": ["disable clipaging"],
+      "commentSyntax": "# === SECTION ===",
+      "exitAndSave": ["save"],
+      "productionSafeguards": {
+        "dhcpSnoopingTrust": "Must explicitly trust uplink/trunk interfaces when DHCP snooping is enabled: `config dhcp_snooping ports {portNum} state enable trust`. Without this, legitimate DHCP server packets arriving on uplinks are dropped.",
+        "addressBindingPerPort": "Global `enable address_binding dhcp_snoop` alone does not enforce IP-MAC inspection. Must pair with explicit port activation: `config address_binding dhcp_snoop ports {portNum} state enable`.",
+        "stormControlUnitVerification": "Always verify traffic_control threshold units (`pps` vs `kbps`) against DGS firmware via `config traffic_control ?` before committing bare integer thresholds.",
+        "pvidMembershipAlignment": "For native access/trunk VLANs, both `config ports {portNum} pvid {vid}` and `config vlan {vlanName} add untagged {portNum}` are generated to ensure cross-ASIC compatibility across older and newer D-Link switches."
+      },
+      "interfaceNaming": {
+        "physical": "{portId}",
+        "channelGroup": "link_aggregation {id}"
+      },
+      "l2Rules": {
+        "pvid": "config ports {ports} pvid {vlanId}",
+        "vlanAdd": "config vlan {vlanName} add untagged|tagged {ports}"
+      },
+      "l3Rules": {
+        "staticRoute": {
+          "syntax": "create iproute {prefix}/{prefixLength} {nextHop} [metric {distance}]",
+          "standaloneConstraint": "create iproute MUST ALWAYS include inline destination network and next hop (`create iproute 0.0.0.0/0 172.16.1.254 metric 1`). Bare toggles are invalid."
+        },
+        "ospf": ["config ospf router_id {routerId}", "enable ospf", "create ospf area {area} type normal"],
+        "bgp": ["config bgp as_number {asn}", "config bgp router_id {routerId}", "enable bgp", "create bgp peer {ip} remote_as {remoteAs}"]
+      }
+    }
+  }
+}

@@ -1,69 +1,126 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Network, Lock, User, ArrowRight, ShieldCheck, UserPlus } from 'lucide-react';
+import { Network, Eye, EyeOff, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
 
 export default function Login({ onLogin }) {
   const [isRegister, setIsRegister] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const vantaRef = useRef(null);
-  const [vantaEffect, setVantaEffect] = useState(0);
 
+  const canvasRef = useRef(null);
+  const mouseRef = useRef({ x: -1000, y: -1000, radius: 150 });
+
+  // Gentle, minimal light-themed network background
   useEffect(() => {
-    // Dynamically load the lottie-player script
-    const lottieScript = document.createElement("script");
-    lottieScript.src = "https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js";
-    lottieScript.async = true;
-    document.body.appendChild(lottieScript);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
 
-    // Load Vanta TRUNK dependencies
-    const loadVanta = async () => {
-      if (!window.p5) {
-        const p5Script = document.createElement('script');
-        p5Script.src = "https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.min.js";
-        p5Script.async = false;
-        document.body.appendChild(p5Script);
-        await new Promise(resolve => p5Script.onload = resolve);
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', handleResize);
+
+    const handleMouseMove = (e) => {
+      mouseRef.current.x = e.clientX;
+      mouseRef.current.y = e.clientY;
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+
+    const pointsCount = Math.floor((width * height) / 24000);
+    const points = Array.from({ length: Math.max(26, pointsCount) }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
+      radius: Math.random() * 1.8 + 1.2,
+      baseRadius: Math.random() * 1.8 + 1.2,
+      pulse: Math.random() * Math.PI
+    }));
+
+    const render = () => {
+      ctx.fillStyle = '#F8FAFC';
+      ctx.fillRect(0, 0, width, height);
+
+      // Soft grid
+      ctx.strokeStyle = 'rgba(203, 213, 225, 0.38)';
+      ctx.lineWidth = 1;
+      const gridSize = 50;
+      for (let x = 0; x < width; x += gridSize) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
       }
-      
-      if (!window.VANTA || !window.VANTA.TRUNK) {
-        const vantaScript = document.createElement('script');
-        vantaScript.src = "https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.trunk.min.js";
-        vantaScript.async = false;
-        document.body.appendChild(vantaScript);
-        await new Promise(resolve => vantaScript.onload = resolve);
+      for (let y = 0; y < height; y += gridSize) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
       }
 
-      if (!vantaEffect && vantaRef.current && window.VANTA && window.VANTA.TRUNK) {
-        setVantaEffect(
-          window.VANTA.TRUNK({
-            el: vantaRef.current,
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200.00,
-            minWidth: 200.00,
-            scale: 1.00,
-            scaleMobile: 1.00,
-            color: 0xfcfcfc,
-            spacing: 2.50,
-            chaos: 2.00
-          })
-        );
+      // Nodes & Links
+      for (let i = 0; i < points.length; i++) {
+        const p = points[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        // Subtle mouse interaction
+        const dxMouse = p.x - mouseRef.current.x;
+        const dyMouse = p.y - mouseRef.current.y;
+        const distMouse = Math.hypot(dxMouse, dyMouse);
+        if (distMouse < mouseRef.current.radius) {
+          const force = (1 - distMouse / mouseRef.current.radius) * 0.6;
+          p.x += (dxMouse / distMouse) * force;
+          p.y += (dyMouse / distMouse) * force;
+        }
+
+        p.pulse += 0.04;
+        p.radius = p.baseRadius + Math.sin(p.pulse) * 0.3;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#16A34A';
+        ctx.fill();
+
+        for (let j = i + 1; j < points.length; j++) {
+          const p2 = points[j];
+          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+          if (dist < 135) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(22, 163, 74, ${(1 - dist / 135) * 0.24})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
       }
+
+      animationFrameId = requestAnimationFrame(render);
     };
 
-    loadVanta();
+    render();
 
     return () => {
-      document.body.removeChild(lottieScript);
-      if (vantaEffect) vantaEffect.destroy();
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationFrameId);
     };
-  }, [vantaEffect]);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!username || !password) {
+      setError('Please enter username and password.');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
@@ -82,7 +139,7 @@ export default function Login({ onLogin }) {
       try {
         data = JSON.parse(text);
       } catch (e) {
-        throw new Error(`Server returned an invalid response: ${text.substring(0, 50)}...`);
+        throw new Error(`Unexpected server response (${res.status})`);
       }
 
       if (!res.ok) {
@@ -97,113 +154,189 @@ export default function Login({ onLogin }) {
     }
   };
 
-  const inputStyle = {
-    width: '100%',
-    padding: '14px 16px 14px 46px',
-    background: 'rgba(255, 255, 255, 0.05)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    borderRadius: '12px',
-    color: '#FFFFFF',
-    fontSize: '14px',
-    fontWeight: 500,
-    outline: 'none',
-    transition: 'all 0.2s ease',
-    boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
+  const fillDemo = () => {
+    setUsername('admin');
+    setPassword('admin123');
+    setError('');
   };
 
   return (
-    <div ref={vantaRef} style={{ width: '100%', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: '10vw', backgroundColor: '#000000' }}>
-      <div className="animate-fade-in relative z-10" style={{
-        background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px',
-        width: '100%', maxWidth: '420px', padding: '48px 40px',
-        boxShadow: '0 20px 40px -10px rgba(0,0,0,0.5), 0 0 20px rgba(34,197,94,0.1)'
-      }}>
-        <div style={{ textAlign: 'center', marginBottom: '32px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          
-          <lottie-player
-            src="https://lottie.host/8cf4ba71-e5fb-44f3-8134-178c4d389417/0CCsdcgNIP.json"
-            background="transparent"
-            speed="1"
-            style={{ width: "160px", height: "160px", marginBottom: '-10px', marginTop: '-20px' }}
-            loop
-            autoplay
-          ></lottie-player>
+    <div style={{
+      width: '100%', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      backgroundColor: '#F8FAFC', position: 'relative', overflow: 'hidden', padding: '20px'
+    }}>
+      
+      {/* Minimal Background Canvas */}
+      <canvas
+        ref={canvasRef}
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1, pointerEvents: 'none' }}
+      />
 
-          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#FFFFFF', marginBottom: '8px', letterSpacing: '-0.03em' }}>
-            NetConfig Pro
-          </h1>
-          <p style={{ fontSize: '14px', color: '#94A3B8', fontWeight: 500 }}>
-            Enterprise Network Automation Engine
-          </p>
+      {/* Ultra Simple, Premium Light Glassmorphic Login Card */}
+      <div style={{
+        position: 'relative', zIndex: 10,
+        width: '100%', maxWidth: '380px',
+        backgroundColor: 'rgba(255, 255, 255, 0.88)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(203, 213, 225, 0.65)',
+        borderRadius: '20px',
+        padding: '38px 34px',
+        boxShadow: '0 20px 45px -12px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.03)'
+      }}>
+        
+        {/* Simple Brand & Title */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '26px' }}>
+          <div style={{
+            width: '36px', height: '36px', borderRadius: '10px',
+            background: 'linear-gradient(135deg, #16A34A 0%, #0D9488 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(22, 163, 74, 0.25)'
+          }}>
+            <Network size={20} color="#FFFFFF" />
+          </div>
+          <div>
+            <div style={{ fontSize: '17px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.2 }}>NetConfig Pro</div>
+            <div style={{ fontSize: '11px', fontWeight: 600, color: '#64748B' }}>Network Automation Console</div>
+          </div>
         </div>
 
+        <h1 style={{ fontSize: '21px', fontWeight: 800, color: '#0F172A', marginBottom: '6px', letterSpacing: '-0.02em' }}>
+          {isRegister ? 'Create an account' : 'Sign in'}
+        </h1>
+        <p style={{ fontSize: '13px', color: '#64748B', marginBottom: '26px' }}>
+          {isRegister ? 'Enter details to register new operator' : 'Enter your credentials to continue'}
+        </p>
+
         {error && (
-          <div style={{ padding: '12px', background: 'rgba(220, 38, 38, 0.2)', border: '1px solid rgba(220, 38, 38, 0.3)', color: '#FCA5A5', borderRadius: '8px', marginBottom: '20px', fontSize: '13px', fontWeight: 600, textAlign: 'center' }}>
-            {error}
+          <div style={{
+            padding: '10px 12px', background: '#FEF2F2', border: '1px solid #FCA5A5',
+            color: '#DC2626', borderRadius: '10px', marginBottom: '18px', fontSize: '13px',
+            display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 500
+          }}>
+            <AlertCircle size={16} className="text-red-500 shrink-0" />
+            <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ position: 'relative' }}>
-            <User size={20} color="#94A3B8" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)' }} />
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
+              Username
+            </label>
             <input 
-              type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)}
-              style={inputStyle} onFocus={e => e.target.style.borderColor = '#16A34A'} onBlur={e => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'} required
+              type="text"
+              placeholder="e.g. admin"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              style={{
+                width: '100%', padding: '11px 14px', borderRadius: '10px',
+                border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF', color: '#0F172A',
+                fontSize: '14px', fontWeight: 500, outline: 'none', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+              }}
+              onFocus={(e) => { e.target.style.borderColor = '#16A34A'; e.target.style.boxShadow = '0 0 0 4px rgba(22, 163, 74, 0.12)'; }}
+              onBlur={(e) => { e.target.style.borderColor = '#CBD5E1'; e.target.style.boxShadow = '0 1px 2px rgba(0,0,0,0.03)'; }}
+              required
             />
           </div>
 
-          <div style={{ position: 'relative' }}>
-            <Lock size={20} color="#94A3B8" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)' }} />
-            <input 
-              type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}
-              style={inputStyle} onFocus={e => e.target.style.borderColor = '#16A34A'} onBlur={e => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'} required
-            />
-          </div>
-
-          {!isRegister && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#94A3B8', cursor: 'pointer', fontWeight: 500 }}>
-                <input type="checkbox" style={{ accentColor: '#16A34A', width: '16px', height: '16px' }} /> Remember me
-              </label>
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
+              Password
+            </label>
+            <div style={{ position: 'relative' }}>
+              <input 
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                style={{
+                  width: '100%', padding: '11px 38px 11px 14px', borderRadius: '10px',
+                  border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF', color: '#0F172A',
+                  fontSize: '14px', fontWeight: 500, outline: 'none', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+                }}
+                onFocus={(e) => { e.target.style.borderColor = '#16A34A'; e.target.style.boxShadow = '0 0 0 4px rgba(22, 163, 74, 0.12)'; }}
+                onBlur={(e) => { e.target.style.borderColor = '#CBD5E1'; e.target.style.boxShadow = '0 1px 2px rgba(0,0,0,0.03)'; }}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)',
+                  background: 'none', border: 'none', color: '#64748B', cursor: 'pointer', transition: 'color 0.15s ease'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.color = '#0F172A'}
+                onMouseOut={(e) => e.currentTarget.style.color = '#64748B'}
+              >
+                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+              </button>
             </div>
-          )}
+          </div>
 
-          <button type="submit" disabled={loading} style={{
-              marginTop: '12px', padding: '14px', background: loading ? '#86EFAC' : '#16A34A',
-              color: loading ? '#0F172A' : '#FFFFFF', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: 700,
-              cursor: loading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              gap: '8px', transition: 'all 0.2s ease', boxShadow: '0 4px 14px rgba(22,163,74,0.3)'
-            }}>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              marginTop: '6px', width: '100%', padding: '12px',
+              background: loading ? '#86EFAC' : 'linear-gradient(135deg, #16A34A 0%, #0D9488 100%)',
+              color: '#FFFFFF', border: 'none', borderRadius: '10px',
+              fontSize: '14px', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: loading ? 'none' : '0 4px 14px rgba(22, 163, 74, 0.3)'
+            }}
+            onMouseOver={(e) => !loading && (e.currentTarget.style.transform = 'translateY(-1px)', e.currentTarget.style.boxShadow = '0 6px 18px rgba(22, 163, 74, 0.42)')}
+            onMouseOut={(e) => !loading && (e.currentTarget.style.transform = 'translateY(0)', e.currentTarget.style.boxShadow = '0 4px 14px rgba(22, 163, 74, 0.3)')}
+            onMouseDown={(e) => !loading && (e.currentTarget.style.transform = 'scale(0.99)')}
+            onMouseUp={(e) => !loading && (e.currentTarget.style.transform = 'translateY(-1px)')}
+          >
             {loading ? (
               <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <ShieldCheck className="animate-spin" size={20} /> Authenticating...
+                <RefreshCw className="animate-spin" size={17} /> Signing in...
               </span>
             ) : (
               <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {isRegister ? 'Create Account' : 'Sign In'} {isRegister ? <UserPlus size={18} /> : <ArrowRight size={18} />}
+                {isRegister ? 'Register' : 'Sign in'} <ArrowRight size={17} />
               </span>
             )}
           </button>
         </form>
 
-        <div style={{ textAlign: 'center', marginTop: '24px' }}>
-          <button 
-            type="button" 
+        {/* Minimal Toggle & Demo Options */}
+        <div style={{ marginTop: '26px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid rgba(203, 213, 225, 0.4)', paddingTop: '20px' }}>
+          <button
+            type="button"
             onClick={() => { setIsRegister(!isRegister); setError(''); }}
-            style={{ background: 'none', border: 'none', color: '#60A5FA', fontSize: '13px', fontWeight: 600, cursor: 'pointer', transition: 'color 0.2s ease' }}
-            onMouseOver={(e) => e.target.style.color = '#93C5FD'}
-            onMouseOut={(e) => e.target.style.color = '#60A5FA'}
+            style={{
+              background: 'none', border: 'none', color: '#0284C7', fontSize: '13px',
+              fontWeight: 600, cursor: 'pointer', transition: 'color 0.15s ease'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.color = '#0369A1'}
+            onMouseOut={(e) => e.currentTarget.style.color = '#0284C7'}
           >
             {isRegister ? 'Already have an account? Sign in' : "Don't have an account? Register"}
           </button>
+
+          {!isRegister && (
+            <button
+              type="button"
+              onClick={fillDemo}
+              style={{
+                background: 'rgba(241, 245, 249, 0.8)', border: '1px solid #E2E8F0', color: '#475569',
+                fontSize: '11px', fontWeight: 600, padding: '7px 14px', borderRadius: '8px',
+                cursor: 'pointer', margin: '2px auto 0', transition: 'all 0.15s ease',
+                display: 'flex', alignItems: 'center', gap: '6px'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#E2E8F0'; e.currentTarget.style.color = '#0F172A'; }}
+              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(241, 245, 249, 0.8)'; e.currentTarget.style.color = '#475569'; }}
+            >
+              <span>💡</span> Quick fill: demo admin account
+            </button>
+          )}
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: '32px', borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '24px' }}>
-          <p style={{ fontSize: '12px', color: '#64748B', fontWeight: 500 }}>
-            Secure Access Gateway v2.4.1
-          </p>
-        </div>
       </div>
     </div>
   );
