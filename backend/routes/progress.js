@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const auth = require('../middleware/auth');
 const UserProgress = require('../models/UserProgress');
 
@@ -7,6 +8,14 @@ const UserProgress = require('../models/UserProgress');
 // @desc    Get user's saved progress
 // @access  Private
 router.get('/', auth, async (req, res) => {
+  if (mongoose.connection.readyState !== 1) {
+    const memProgress = global.inMemoryProgress.get(req.user.id);
+    if (!memProgress) {
+      return res.status(404).json({ msg: 'No progress found' });
+    }
+    return res.json(memProgress);
+  }
+
   try {
     const progress = await UserProgress.findOne({ user: req.user.id });
     if (!progress) {
@@ -23,19 +32,22 @@ router.get('/', auth, async (req, res) => {
 // @desc    Save user progress
 // @access  Private
 router.post('/', auth, async (req, res) => {
+  const { state } = req.body;
+
+  if (mongoose.connection.readyState !== 1) {
+    global.inMemoryProgress.set(req.user.id, state);
+    return res.json({ user: req.user.id, state });
+  }
+
   try {
-    const { state } = req.body;
-    
     let progress = await UserProgress.findOne({ user: req.user.id });
     
     if (progress) {
-      // Update
       progress.state = state;
       await progress.save();
       return res.json(progress);
     }
 
-    // Create
     progress = new UserProgress({
       user: req.user.id,
       state
